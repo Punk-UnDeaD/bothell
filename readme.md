@@ -9,4 +9,4 @@ docker-compose exec bin/console app:generate:tasks
 
 ### обработка тасок
 docker-compose exec bin/console app:process:allTasks
-
+в данный момент выполняется автоматически в отдельном контейнере

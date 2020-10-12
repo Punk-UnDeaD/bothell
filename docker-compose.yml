@@ -10,6 +10,16 @@ services:
       - .:/var/www/html
     depends_on:
       - postgres
+
+  php-task-processor:
+    build:
+      context: ./docker/php-task-processor
+      dockerfile: Docker
+    depends_on:
+      - postgres
+    volumes:
+      - .:/var/www/html
+
   postgres:
     image: wodby/postgres:$POSTGRES_TAG
     container_name: "${PROJECT_NAME}_postgres"

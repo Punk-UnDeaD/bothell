@@ -1,0 +1,4 @@
+FROM wodby/php:7.4
+
+copy ./start.sh ./stop.sh /
+CMD /start.sh

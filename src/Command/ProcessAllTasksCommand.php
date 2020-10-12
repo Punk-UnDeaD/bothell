@@ -15,6 +15,7 @@ use Symfony\Component\Process\Process;
 class ProcessAllTasksCommand extends Command
 {
     public const THREADS = 16;
+    public const PACK = 64;
 
     protected static $defaultName = 'app:process:allTasks';
 
@@ -44,6 +45,7 @@ class ProcessAllTasksCommand extends Command
             ->select('uid')
             ->from('task')
             ->distinct()
+            ->setMaxResults($this::PACK)
             ->execute()
             ->fetchFirstColumn();
 
@@ -53,13 +55,14 @@ class ProcessAllTasksCommand extends Command
             $processes = array_filter($processes, fn ($process) => $process->isRunning());
             while ($uids && (count($processes) < $this::THREADS)) {
                 $uid = array_shift($uids);
+                $io->note($uid.' process started');
                 $processes[] = $process = new Process(['bin/console', 'app:process:task', $uid]);
                 $process->start();
             }
             sleep(1);
         };
 
-        $io->success('All processed');
+        $io->success('Chunk processed');
 
         return Command::SUCCESS;
     }
