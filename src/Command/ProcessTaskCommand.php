@@ -48,7 +48,7 @@ class ProcessTaskCommand extends Command
                 $task->getCreated(),
                 $task->getMessage()
             );
-//            sleep(1);
+            sleep(1);
             $this->em->persist($processedTask);
             $this->em->remove($task);
         }
