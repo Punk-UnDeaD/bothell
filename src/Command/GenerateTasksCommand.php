@@ -5,7 +5,6 @@ namespace App\Command;
 use App\Entity\Task;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,6 +12,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GenerateTasksCommand extends Command
 {
+    public const TOTAL = 10000;
+
+    public const USERS = 1000;
+
     protected static $defaultName = 'app:generate:tasks';
 
     /**
@@ -29,9 +32,9 @@ class GenerateTasksCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Add a short description for your command')
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
+            ->setDescription('Task generator')
+            ->addOption('total', 't', InputOption::VALUE_OPTIONAL, 'Total count, default='.$this::TOTAL)
+            ->addOption('users', 'u', InputOption::VALUE_OPTIONAL, 'Users count, default='.$this::USERS);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -39,8 +42,9 @@ class GenerateTasksCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->text('Start generation.');
 
-        $total = 10000;
-        $users = 1000;
+        $total = $input->getOption('total') ?? $this::TOTAL;
+        $users = $input->getOption('users') ?? $this::USERS;
+        $io->text("Tasks: {$total} users: {$users}");
 
         do {
             $sub = rand(1, 11);
@@ -51,9 +55,9 @@ class GenerateTasksCommand extends Command
                 $task = new Task($user, "-={$sub}=-");
                 $this->em->persist($task);
             } while ($sub);
-            $this->em->flush();
         } while ($total > 0);
 
+        $this->em->flush();
         $io->success('All done');
 
         return Command::SUCCESS;

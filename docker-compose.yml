@@ -15,6 +15,9 @@ services:
     build:
       context: ./docker/php-task-processor
       dockerfile: Docker
+    environment:
+      TASK_THREADS: $TASK_THREADS
+      TASK_PACK: $TASK_PACK
     depends_on:
       - postgres
     volumes:

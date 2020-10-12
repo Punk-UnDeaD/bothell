@@ -31,27 +31,36 @@ class ProcessTaskCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Add a short description for your command')
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
+            ->setDescription('Process messages for specific user')
+            ->addArgument('uid', InputArgument::REQUIRED, 'User id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
-        $tasks = $this->em->getRepository(Task::class)->findBy(['user' => $arg1], ['id' => 'ASC']);
-        /** @var Task $task */
-        foreach ($tasks as $task) {
-            $processedTask = new ProcessedTask(
-                $task->getUser(),
-                $task->getCreated(),
-                $task->getMessage()
-            );
-            sleep(1);
-            $this->em->persist($processedTask);
-            $this->em->remove($task);
-            $this->em->flush();
+
+        $uid = $input->getArgument('uid');
+        $io->note($uid.' started');
+
+        try {
+            $tasks = $this->em->getRepository(Task::class)->findBy(['user' => $uid], ['id' => 'ASC']);
+            /** @var Task $task */
+            foreach ($tasks as $task) {
+                $processedTask = new ProcessedTask(
+                    $task->getUser(),
+                    $task->getCreated(),
+                    $task->getMessage()
+                );
+                sleep(1);
+                $this->em->persist($processedTask);
+                $this->em->remove($task);
+                $this->em->flush();
+            }
+            $io->note($uid.' processed');
+        } catch (\Exception $e) {
+            $io->error($uid.'::'.$e->getMessage());
+
+            return Command::FAILURE;
         }
 
         return Command::SUCCESS;

@@ -5,9 +5,20 @@ docker-compose up -d
 console doctrine:migrations:migrate -n
 
 ### генерация тасок
-docker-compose exec bin/console app:generate:tasks
+docker-compose exec php console app:generate:tasks --total=10000 --users=1000
+
+### обработка тасок одного пользователя
+docker-compose exec php console app:process:task \<uid\>
+
+Аргументы: uid - User id
 
 ### обработка тасок
-docker-compose exec bin/console app:process:allTasks
+docker-compose exec php console app:process:allTasks --pack=200 --threads=16
 
 в данный момент выполняется автоматически в отдельном контейнере
+
+### принудительно остановить контейнер с обработчиком тасок
+docker-compose kill php-task-processor
+
+### отправить сигнал на оснановку контейнеру с обработчиком тасок
+docker-compose exec php-task-processor sh /stop.sh
