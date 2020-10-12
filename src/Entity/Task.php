@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
+ * @ORM\Table(indexes={@ORM\Index(name="uid", columns={"uid"})})
  */
 class Task
 {

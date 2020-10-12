@@ -45,7 +45,6 @@ class GenerateTasksCommand extends Command
         $total = $input->getOption('total') ?? $this::TOTAL;
         $users = $input->getOption('users') ?? $this::USERS;
         $io->text("Tasks: {$total} users: {$users}");
-
         do {
             $sub = rand(1, 10);
             $total -= $sub;
