@@ -41,27 +41,39 @@ class ProcessTaskCommand extends Command
 
         $uid = $input->getArgument('uid');
         $io->note($uid.' started');
-
-        try {
-            $tasks = $this->em->getRepository(Task::class)->findBy(['user' => $uid], ['id' => 'ASC']);
-            /** @var Task $task */
-            foreach ($tasks as $task) {
-                $processedTask = new ProcessedTask(
-                    $task->getUser(),
-                    $task->getCreated(),
-                    $task->getMessage()
-                );
-                sleep(1);
-                $this->em->persist($processedTask);
-                $this->em->remove($task);
-                $this->em->flush();
+        $processedTasks = [];
+        while (true) {
+            try {
+                $tasks = $this->em->getRepository(Task::class)->findBy(['user' => $uid], ['id' => 'ASC']);
+                $this->em->getConnection()->close();
+                /** @var Task $task */
+                foreach ($tasks as $task) {
+                    $processedTasks[] = new ProcessedTask(
+                        $task->getUser(),
+                        $task->getCreated(),
+                        $task->getMessage()
+                    );
+                    sleep(1);
+                }
+                break;
+            } catch (\Exception $e) {
             }
-            $io->note($uid.' processed');
-        } catch (\Exception $e) {
-            $io->error($uid.'::'.$e->getMessage());
-
-            return Command::FAILURE;
         }
+        while (true) {
+            try {
+                $this->em->getConnection()->connect();
+                foreach ($processedTasks as $task) {
+                    $this->em->persist($task);
+                }
+                foreach ($tasks as $task) {
+                    $this->em->remove($task);
+                }
+                $this->em->flush();
+                break;
+            } catch (\Exception $e) {
+            }
+        }
+        $io->note($uid.' processed');
 
         return Command::SUCCESS;
     }

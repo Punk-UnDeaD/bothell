@@ -47,9 +47,9 @@ class GenerateTasksCommand extends Command
         $io->text("Tasks: {$total} users: {$users}");
 
         do {
-            $sub = rand(1, 11);
+            $sub = rand(1, 10);
             $total -= $sub;
-            $user = rand(1, $users + 1);
+            $user = rand(1, $users);
             do {
                 $sub--;
                 $task = new Task($user, "-={$sub}=-");

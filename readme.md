@@ -17,6 +17,10 @@ docker-compose exec php console app:process:allTasks --pack=200 --threads=16
 
 в данный момент выполняется автоматически в отдельном контейнере
 
+### обработка тасок с максимальной конкуренцией
+docker-compose exec php console app:process:allTasks --pack=1000 --threads=1000
+
+
 ### принудительно остановить контейнер с обработчиком тасок
 docker-compose kill php-task-processor
 
