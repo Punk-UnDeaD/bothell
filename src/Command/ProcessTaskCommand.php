@@ -51,10 +51,8 @@ class ProcessTaskCommand extends Command
             sleep(1);
             $this->em->persist($processedTask);
             $this->em->remove($task);
+            $this->em->flush();
         }
-
-
-        $this->em->flush();
 
         return Command::SUCCESS;
     }
