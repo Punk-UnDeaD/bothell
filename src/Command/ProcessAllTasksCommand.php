@@ -45,9 +45,10 @@ class ProcessAllTasksCommand extends Command
         $pack = (int)$input->getOption('pack') ?: $this::PACK;
         $io->note("Chunk process started, pack={$pack}, threads={$threads}");
         $uids = $this->connection->createQueryBuilder()
-            ->select('uid')
+            ->select('uid', 'count(*) as count')
             ->from('task')
-            ->distinct()
+            ->groupBy('uid')
+            ->orderBy('count', 'DESC')
             ->setMaxResults($pack)
             ->execute()
             ->fetchFirstColumn();
