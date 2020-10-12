@@ -49,7 +49,7 @@ class ProcessAllTasksCommand extends Command
 
         $processes = [];
 
-        while ($uids) {
+        while ($uids || $processes) {
             $processes = array_filter($processes, fn ($process) => $process->isRunning());
             while ($uids && (count($processes) < $this::THREADS)) {
                 $uid = array_shift($uids);
